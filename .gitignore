@@ -1,0 +1,12 @@
+# Python junk
+__pycache__/
+*.pyc
+# Virtual env
+venv/
+# Training data (you probably don't want this on GitHub)
+data/
+NAYA_DATA_AUG1X/
+# Logs and large images
+logs/
+output/confusion_matrix_*.png
+
