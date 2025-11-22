@@ -17,3 +17,5 @@ fastapi
 uvicorn[standard]
 python-multipart
 requests
+soundfile
+librosa

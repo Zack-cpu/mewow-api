@@ -16,6 +16,8 @@ import torchaudio
 import config
 from model import create_model, load_clap_processor
 
+import soundfile as sf
+
 # ----------------- Paths & device -----------------
 
 DEVICE = torch.device(
@@ -130,12 +132,23 @@ def _preprocess_waveform(waveform: torch.Tensor, sample_rate: int) -> torch.Tens
 
 def _load_waveform_from_bytes(audio_bytes: bytes) -> Tuple[torch.Tensor, int]:
     """
-    Load waveform + sample rate from raw bytes using torchaudio.
-    Works with wav/mp3/etc as long as torchaudio has the backend.
+    Load waveform + sample rate from raw bytes using soundfile instead of torchaudio.
+    Works with wav/mp3/etc as long as soundfile/FFmpeg can decode it.
+
+    Returns:
+        waveform: Tensor of shape [channels, samples]
+        sample_rate: int
     """
     file_like = io.BytesIO(audio_bytes)
-    waveform, sample_rate = torchaudio.load(file_like)
+
+    # sf.read returns numpy array with shape [samples] or [samples, channels]
+    data, sample_rate = sf.read(file_like, always_2d=True)  # [samples, channels]
+
+    # convert to torch and put channels first: [channels, samples]
+    waveform = torch.from_numpy(data).T  # (C, T)
+
     return waveform, sample_rate
+
 
 
 # ----------------- Public prediction API -----------------
